@@ -1,4 +1,5 @@
 import httpx
+from core.logging import logger
 
 WEATHER_URL = "https://api.open-meteo.com/v1/forecast"
 
@@ -13,6 +14,9 @@ async def get_current_weather(
         "longitude": longitude,
         "current": "temperature_2m,weather_code,wind_speed_10m"
     }
+    logger.info(
+    f"Fetching weather for latitude={latitude}, longitude={longitude}"
+)
 
     async with httpx.AsyncClient(timeout=10.0) as client:
 
@@ -22,10 +26,16 @@ async def get_current_weather(
         )
 
         response.raise_for_status()
+        logger.info(
+    "Weather API request successful"
+)
 
     data = response.json()
 
     current = data["current"]
+    logger.info(
+    "Weather data processed successfully"
+)
 
     return {
         "temperature": current["temperature_2m"],

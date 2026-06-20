@@ -1,6 +1,8 @@
-from datetime import datetime,timezone
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException
+
+from core.logging import logger
 
 from services.geocoding_service import get_city_coordinates
 from services.weather_service import get_current_weather
@@ -15,9 +17,18 @@ router = APIRouter(
 @router.get("/current")
 async def current_weather(city: str):
 
+    logger.info(
+        f"/weather/current requested for city={city}"
+    )
+
     location = await get_city_coordinates(city)
 
     if not location:
+
+        logger.warning(
+            f"City not found: {city}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="City not found"
@@ -32,6 +43,10 @@ async def current_weather(city: str):
         weather["temperature"],
         weather["wind_speed"],
         weather["weather_code"]
+    )
+
+    logger.info(
+        f"Current weather response generated for city={city}"
     )
 
     return {
@@ -46,9 +61,18 @@ async def current_weather(city: str):
 @router.get("/advisory")
 async def weather_advisory(city: str):
 
+    logger.info(
+        f"/weather/advisory requested for city={city}"
+    )
+
     location = await get_city_coordinates(city)
 
     if not location:
+
+        logger.warning(
+            f"City not found: {city}"
+        )
+
         raise HTTPException(
             status_code=404,
             detail="City not found"
@@ -63,6 +87,10 @@ async def weather_advisory(city: str):
         weather["temperature"],
         weather["wind_speed"],
         weather["weather_code"]
+    )
+
+    logger.info(
+        f"Weather advisory response generated for city={city}"
     )
 
     return {
